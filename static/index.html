@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SQL Practice</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2d3148;
+      padding: 0 24px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo { font-size: 15px; font-weight: 700; color: #ff6b35; letter-spacing: -0.3px; }
+    .hdivider { color: #2d3148; font-size: 20px; }
+    .question-title { font-size: 13.5px; font-weight: 600; color: #e2e8f0; }
+    .difficulty-badge {
+      background: #0f2a1a; color: #4ade80;
+      font-size: 11px; font-weight: 700; padding: 3px 9px;
+      border-radius: 99px; border: 1px solid #166534;
+    }
+    .question-id { color: #4b5563; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+
+    /* Main */
+    .main { display: flex; flex: 1; overflow: hidden; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 360px; flex-shrink: 0;
+      background: #13151f;
+      border-right: 1px solid #2d3148;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-inner { padding: 20px; display: flex; flex-direction: column; gap: 22px; }
+
+    .section-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: #4b5563; margin-bottom: 10px;
+    }
+
+    .question-text { font-size: 13px; line-height: 1.75; color: #94a3b8; }
+    .question-text strong { color: #e2e8f0; }
+
+    .table-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: #ff6b35;
+      background: #1f1710; border: 1px solid #3d2010;
+      padding: 4px 10px; border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 10px;
+    }
+    .table-chip::before { content: "⊞"; font-size: 11px; }
+
+    .schema-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .schema-tbl th {
+      text-align: left; padding: 5px 10px;
+      color: #4b5563; border-bottom: 1px solid #2d3148;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .schema-tbl td { padding: 6px 10px; border-bottom: 1px solid #1a1d27; }
+    .col-name { color: #cbd5e1; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .col-type { color: #6366f1; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+    .sample-wrap { overflow-x: auto; border-radius: 6px; border: 1px solid #2d3148; }
+    .sample-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+    .sample-tbl th {
+      text-align: left; padding: 6px 10px; color: #6b7280;
+      background: #1a1d27; border-bottom: 1px solid #2d3148;
+      white-space: nowrap;
+    }
+    .sample-tbl td {
+      padding: 5px 10px; border-bottom: 1px solid #1a1d27; color: #94a3b8;
+      white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sample-tbl tr:last-child td { border-bottom: none; }
+    .sample-tbl tr:hover td { background: #1a1d27; }
+
+    /* Editor Panel */
+    .editor-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .editor-toolbar {
+      padding: 8px 16px; border-bottom: 1px solid #2d3148;
+      display: flex; align-items: center; gap: 8px;
+      background: #13151f; flex-shrink: 0; height: 44px;
+    }
+    .lang-badge {
+      font-size: 11px; font-weight: 700; color: #6b7280;
+      background: #1e2030; padding: 3px 9px; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
+    }
+    .run-hint {
+      font-size: 11px; color: #6b7280;
+      font-family: 'Inter', sans-serif; letter-spacing: 0.2px;
+      transition: color 0.15s;
+    }
+    .run-hint-active { color: #4ade80; font-weight: 600; }
+    .spacer { flex: 1; }
+
+    .btn {
+      padding: 6px 16px; border-radius: 6px;
+      font-size: 12.5px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s;
+      font-family: 'Inter', sans-serif; letter-spacing: 0.2px;
+    }
+    .btn-run { background: #162a1e; color: #4ade80; border: 1px solid #166534; }
+    .btn-run:hover { background: #166534; color: #fff; }
+    .btn-submit { background: #ff6b35; color: #fff; }
+    .btn-submit:hover { background: #e85d29; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .editor-container { flex: 1; overflow: hidden; min-height: 0; }
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13.5px !important;
+      line-height: 1.65 !important;
+      background: #0f1117 !important;
+    }
+    .CodeMirror-scroll { background: #0f1117 !important; }
+
+    /* Results */
+    .results-panel {
+      height: 220px; flex-shrink: 0;
+      border-top: 1px solid #2d3148;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .results-tabs {
+      display: flex; align-items: center;
+      background: #13151f; border-bottom: 1px solid #2d3148;
+      padding: 0 16px; flex-shrink: 0;
+    }
+    .results-tab {
+      font-size: 12px; font-weight: 600; color: #4b5563;
+      padding: 9px 14px; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .results-tab.active { color: #ff6b35; border-bottom-color: #ff6b35; }
+    .row-count { font-size: 11px; color: #4b5563; margin-left: auto; }
+
+    .results-content { flex: 1; overflow: auto; padding: 12px 16px; }
+    .results-placeholder {
+      color: #2d3148; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; font-style: italic;
+    }
+
+    .res-tbl { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+    .res-tbl th {
+      text-align: left; padding: 6px 12px; color: #94a3b8;
+      background: #1a1d27; border-bottom: 1px solid #2d3148;
+      font-weight: 600; position: sticky; top: 0; white-space: nowrap;
+    }
+    .res-tbl td { padding: 6px 12px; border-bottom: 1px solid #1a1d27; color: #cbd5e1; white-space: nowrap; }
+    .res-tbl tr:hover td { background: #1a1d27; }
+
+    .error-box {
+      background: #1a0f12; border: 1px solid #5c1c2a; border-radius: 6px;
+      padding: 12px 16px; color: #f87171;
+      font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      white-space: pre-wrap; line-height: 1.6;
+    }
+    .success-bar {
+      background: #0a2018; border: 1px solid #166534; border-radius: 6px;
+      padding: 10px 16px; color: #4ade80;
+      font-size: 13px; font-weight: 600; margin-bottom: 12px;
+    }
+    .wrong-bar {
+      background: #1a0f12; border: 1px solid #5c1c2a; border-radius: 6px;
+      padding: 10px 16px; color: #f87171;
+      font-size: 13px; font-weight: 600; margin-bottom: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      background: #13151f; border-top: 1px solid #2d3148;
+      padding: 0 24px; height: 44px;
+      display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .attempt-label { font-size: 11px; color: #4b5563; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #2d3148; transition: background 0.2s; }
+    .dot.used { background: #f87171; }
+    .dot.correct { background: #4ade80; }
+
+    .prog-section { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+    .prog-label { font-size: 11px; color: #4b5563; }
+    .prog-track { width: 160px; height: 5px; background: #2d3148; border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, #ff6b35, #ff9a6b); border-radius: 3px; transition: width 0.5s ease; }
+    .prog-count { font-size: 12px; font-weight: 700; color: #ff6b35; min-width: 52px; text-align: right; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <span class="logo">SQL Practice</span>
+      <span class="hdivider">|</span>
+      <span class="difficulty-badge" id="q-badge">Loading...</span>
+      <span class="question-title" id="q-title"></span>
+      <span class="question-id" id="q-id"></span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="sidebar">
+      <div class="sidebar-inner" id="sidebar-inner">
+        <div class="results-placeholder" style="margin-top:40px; color:#3d4260;">Loading question...</div>
+      </div>
+    </div>
+
+    <div class="editor-panel">
+      <div class="editor-toolbar">
+        <span class="lang-badge">SQL (PostgreSQL)</span>
+        <span class="run-hint" id="run-hint">Run executes the whole editor</span>
+        <div class="spacer"></div>
+        <button class="btn btn-run" id="btn-run" onclick="handleRun()">▶ Run</button>
+        <button class="btn btn-submit" id="btn-submit" onclick="handleSubmit()">✓ Submit</button>
+      </div>
+
+      <div class="editor-container">
+        <textarea id="sql-editor">-- Write your SQL here
+SELECT
+</textarea>
+      </div>
+
+      <div class="results-panel">
+        <div class="results-tabs">
+          <div class="results-tab active">Results</div>
+          <span class="row-count" id="row-count"></span>
+        </div>
+        <div class="results-content" id="results-content">
+          <div class="results-placeholder">Run your query to see results</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span class="attempt-label">Attempts</span>
+    <div class="dots">
+      <div class="dot" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+    </div>
+    <div class="prog-section">
+      <span class="prog-label">Progress</span>
+      <div class="prog-track">
+        <div class="prog-fill" id="prog-fill" style="width: 4%"></div>
+      </div>
+      <span class="prog-count" id="prog-count">2 / 50 ★</span>
+    </div>
+  </div>
+
+  <script>
+    const editor = CodeMirror.fromTextArea(document.getElementById('sql-editor'), {
+      mode: 'text/x-sql',
+      theme: 'dracula',
+      lineNumbers: true,
+      indentWithTabs: false,
+      tabSize: 2,
+      lineWrapping: true,
+      autofocus: true,
+      extraKeys: {
+        'Tab': 'indentMore',
+        'Shift-Tab': 'indentLess',
+        'Cmd-Enter': () => handleRun(),
+        'Ctrl-Enter': () => handleRun()
+      }
+    });
+
+    // Toolbar hint reflects whether Run will use the selection or the whole editor.
+    editor.on('cursorActivity', () => {
+      const hint = document.getElementById('run-hint');
+      if (!hint) return;
+      if (editor.somethingSelected()) {
+        hint.textContent = '▶ Run executes the highlighted selection';
+        hint.classList.add('run-hint-active');
+      } else {
+        hint.textContent = 'Run executes the whole editor (⌘/Ctrl+Enter)';
+        hint.classList.remove('run-hint-active');
+      }
+    });
+
+    window.appState = {
+      question_id: new URLSearchParams(location.search).get('q') || 9663,
+      attempts: 0,
+      maxAttempts: 3,
+      solved: false,
+      solved_count: 2,
+      total: 50
+    };
+
+    const DIFFICULTY = { 1: ['Easy', '#0f2a1a', '#4ade80', '#166534'], 2: ['Medium', '#1f1a0a', '#fbbf24', '#92400e'], 3: ['Hard', '#1a0f12', '#f87171', '#5c1c2a'] };
+
+    function renderQuestion(q) {
+      const [label, bg, fg, border] = DIFFICULTY[q.difficulty] || DIFFICULTY[1];
+      const badge = document.getElementById('q-badge');
+      badge.textContent = label;
+      badge.style.cssText = `background:${bg};color:${fg};border-color:${border};font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid ${border};`;
+      document.getElementById('q-title').textContent = q.title;
+      document.getElementById('q-id').textContent = `#${window.appState.question_id}`;
+
+      // Build sidebar
+      let html = `<div><div class="section-label">Question</div><div class="question-text">${q.question_text.replace(/\n/g,'<br>')}</div></div>`;
+
+      for (const tbl of q.tables) {
+        html += `<div><div class="section-label">Schema</div><div class="table-chip">${tbl.name}</div>`;
+        html += `<table class="schema-tbl"><thead><tr><th>Column</th><th>Type</th></tr></thead><tbody>`;
+        for (const col of tbl.columns) {
+          html += `<tr><td class="col-name">${col.name}</td><td class="col-type">${col.type}</td></tr>`;
+        }
+        html += `</tbody></table></div>`;
+
+        if (tbl.sample_columns && tbl.sample_rows && tbl.sample_rows.length) {
+          html += `<div><div class="section-label">Sample Data</div><div class="sample-wrap"><table class="sample-tbl"><thead><tr>`;
+          for (const c of tbl.sample_columns) html += `<th>${c}</th>`;
+          html += `</tr></thead><tbody>`;
+          for (const row of tbl.sample_rows) {
+            html += `<tr>`;
+            for (const v of row) html += `<td>${v !== null ? v : 'NULL'}</td>`;
+            html += `</tr>`;
+          }
+          html += `</tbody></table></div></div>`;
+        }
+      }
+
+      document.getElementById('sidebar-inner').innerHTML = html;
+    }
+
+    async function loadQuestion(id) {
+      const { job_id } = await fetch(`/api/question/${id}`).then(r => r.json());
+      let elapsed = 0;
+      while (true) {
+        await new Promise(r => setTimeout(r, 800));
+        elapsed += 0.8;
+        document.getElementById('sidebar-inner').innerHTML =
+          `<div class="results-placeholder" style="margin-top:40px;color:#ff6b35;">⏳ Loading question... ${Math.round(elapsed)}s</div>`;
+        const job = await fetch(`/api/status/${job_id}`).then(r => r.json());
+        if (job.status === 'done') { renderQuestion(job.result); break; }
+      }
+    }
+
+    // Load question on page start
+    loadQuestion(window.appState.question_id);
+
+    function getQuery() { return editor.getValue(); }
+
+    // Run only the highlighted text when there is a selection, otherwise the whole editor.
+    function getRunQuery() {
+      if (editor.somethingSelected()) return editor.getSelection().trim();
+      return editor.getValue().trim();
+    }
+
+    async function pollJob(job_id) {
+      let elapsed = 0;
+      const dots = ['⏳', '⌛'];
+      while (true) {
+        await new Promise(r => setTimeout(r, 600));
+        elapsed += 0.6;
+        const icon = dots[Math.floor(elapsed) % dots.length];
+        document.getElementById('results-content').innerHTML =
+          `<div class="results-placeholder" style="color:#ff6b35;">${icon} Executing... ${Math.round(elapsed)}s</div>`;
+        const res = await fetch(`/api/status/${job_id}`);
+        const job = await res.json();
+        if (job.status === 'done') return job.result;
+        if (job.status === 'not_found') throw new Error('Job not found');
+      }
+    }
+
+    async function handleRun() {
+      const q = getRunQuery();
+      if (!q) return;
+      setLoading();
+      setBtnsDisabled(true);
+      try {
+        const { job_id } = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question_id: window.appState.question_id, sql: q, code_type: 1 })
+        }).then(r => r.json());
+        const data = await pollJob(job_id);
+        showRunResults(data, data.error);
+      } catch (e) {
+        showRunResults(null, e.message);
+      } finally {
+        setBtnsDisabled(false);
+      }
+    }
+
+    async function handleSubmit() {
+      if (window.appState.solved || window.appState.attempts >= window.appState.maxAttempts) return;
+      const q = editor.getValue().trim();
+      if (!q) return;
+      window.appState.attempts = Math.min(window.appState.attempts + 1, 3);
+      updateDots('pending');
+      setLoading();
+      setBtnsDisabled(true);
+      try {
+        const { job_id } = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question_id: window.appState.question_id, sql: q, code_type: 1 })
+        }).then(r => r.json());
+        const data = await pollJob(job_id);
+        showSubmitResult(data.correct, data, data.error, data.diff);
+        if (window.appState.attempts >= window.appState.maxAttempts && !data.correct) {
+          document.getElementById('btn-submit').disabled = true;
+        }
+      } catch (e) {
+        showSubmitResult(false, null, e.message, null);
+      } finally {
+        setBtnsDisabled(false);
+      }
+    }
+
+    function setBtnsDisabled(val) {
+      document.getElementById('btn-run').disabled = val;
+      document.getElementById('btn-submit').disabled = val || window.appState.solved;
+    }
+
+    function setLoading() {
+      document.getElementById('results-content').innerHTML =
+        '<div class="results-placeholder" style="color:#ff6b35; animation: pulse 1s infinite;">⏳ Executing...</div>';
+      document.getElementById('row-count').textContent = '';
+    }
+
+    function showRunResults(data, error) {
+      if (error) {
+        const clean = error.replace(/\(Background on this error.*$/gs, '').replace(/\[SQL:.*$/gs, '').trim();
+        document.getElementById('results-content').innerHTML = `<div class="error-box">${clean}</div>`;
+        document.getElementById('row-count').textContent = '';
+        return;
+      }
+      if (!data || !data.columns) {
+        document.getElementById('results-content').innerHTML = '<div class="results-placeholder">No results</div>';
+        return;
+      }
+      renderTable(data);
+    }
+
+    function showSubmitResult(correct, data, error, diff) {
+      if (correct) {
+        updateDots('correct');
+        window.appState.solved = true;
+        window.appState.solved_count++;
+        updateProgress();
+        let html = '<div class="success-bar">✅ Correct! Great work.</div>';
+        if (data && data.columns) html += buildTable(data);
+        document.getElementById('results-content').innerHTML = html;
+        document.getElementById('row-count').textContent = data ? `${data.data.length} rows` : '';
+      } else {
+        updateDots('wrong');
+        const attLeft = window.appState.maxAttempts - window.appState.attempts;
+        const msg = attLeft > 0
+          ? `❌ Not quite — ${attLeft} attempt${attLeft > 1 ? 's' : ''} remaining`
+          : '❌ Out of attempts — check the solution below';
+        let html = `<div class="wrong-bar">${msg}</div>`;
+        if (diff) html += `<div class="error-box" style="color:#94a3b8;">${diff}</div>`;
+        else if (error) html += `<div class="error-box">${error}</div>`;
+        document.getElementById('results-content').innerHTML = html;
+        document.getElementById('row-count').textContent = '';
+      }
+    }
+
+    function renderTable(data) {
+      document.getElementById('results-content').innerHTML = buildTable(data);
+      document.getElementById('row-count').textContent = `${data.data.length} rows`;
+    }
+
+    function buildTable(data) {
+      const cols = data.columns, rows = data.data;
+      let h = '<table class="res-tbl"><thead><tr>';
+      cols.forEach(c => { h += `<th>${c}</th>`; });
+      h += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        h += '<tr>';
+        r.forEach(v => { h += `<td>${v !== null ? v : '<span style="color:#3d4260">NULL</span>'}</td>`; });
+        h += '</tr>';
+      });
+      h += '</tbody></table>';
+      return h;
+    }
+
+    function updateDots(state) {
+      const idx = window.appState.attempts - 1;
+      const dot = document.getElementById(`dot-${idx}`);
+      if (!dot) return;
+      dot.classList.remove('used', 'correct');
+      if (state === 'pending' || state === 'wrong') dot.classList.add('used');
+      if (state === 'correct') dot.classList.add('correct');
+    }
+
+    function updateProgress() {
+      const pct = Math.round((window.appState.solved_count / window.appState.total) * 100);
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('prog-count').textContent = `${window.appState.solved_count} / ${window.appState.total} ★`;
+    }
+  </script>
+
+</body>
+</html>

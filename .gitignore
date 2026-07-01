@@ -1,0 +1,12 @@
+# ── Secrets: NEVER commit ──
+# live Stratascratch OAuth access + refresh tokens
+.oauth.json
+*.token
+.env
+
+# ── Local cache / build artefacts ──
+# cached question metadata (rebuilds itself)
+.qcache.json
+__pycache__/
+*.pyc
+.DS_Store
