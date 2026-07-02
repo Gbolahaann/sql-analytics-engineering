@@ -14,3 +14,4 @@
 | 10159 | [Ranking Most Active Guests](10159-ranking-most-active-guests.sql) | Medium | Aggregate then rank in one pass: DENSE_RANK() OVER (ORDER BY SUM(n_messages) DESC) with GROUP BY guest. |
 | 2102 | [Flags Per Video](2102-flags-per-video.sql) | Medium | A 'unique user' spans two columns, so build the key with CONCAT and COUNT(DISTINCT . |
 | 10172 | [Best Selling Item (first Hard)](10172-best-selling-item-first-hard.sql) | Hard | Full count → rank → filter skeleton. |
+| 2007 | [Rank Variance Per Country](2007-rank-variance-per-country.sql) | Hard | Rank within each month, CASE-pivot both months onto one row, compare; NULL from a missing month self-excludes (no COALESCE). |

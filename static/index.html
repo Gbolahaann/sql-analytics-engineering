@@ -414,10 +414,12 @@ SELECT
     }
 
     async function handleSubmit() {
-      if (window.appState.solved || window.appState.attempts >= window.appState.maxAttempts) return;
+      // No hard attempt cap — this is a practice tool, iterate as needed.
+      // The counter still tracks tries as a gentle signal; it just never locks.
+      if (window.appState.solved) return;
       const q = editor.getValue().trim();
       if (!q) return;
-      window.appState.attempts = Math.min(window.appState.attempts + 1, 3);
+      window.appState.attempts = window.appState.attempts + 1;
       updateDots('pending');
       setLoading();
       setBtnsDisabled(true);
@@ -429,9 +431,7 @@ SELECT
         }).then(r => r.json());
         const data = await pollJob(job_id);
         showSubmitResult(data.correct, data, data.error, data.diff);
-        if (window.appState.attempts >= window.appState.maxAttempts && !data.correct) {
-          document.getElementById('btn-submit').disabled = true;
-        }
+        // Never lock the submit button; only stop once the question is solved.
       } catch (e) {
         showSubmitResult(false, null, e.message, null);
       } finally {
