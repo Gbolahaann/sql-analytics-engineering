@@ -27,16 +27,17 @@ A 50-question roadmap across four phases.
 ```
 Phase 1 — Foundations        [████████████████████]  10/10 ✅
 Phase 2 — Window Functions   [████████████████████]  15/15 ✅
-Phase 3 — CTEs               [░░░░░░░░░░░░░░░░░░░░]   0/15
+Phase 3 — CTEs               [█▎░░░░░░░░░░░░░░░░░░]   1/15
 Phase 4 — Advanced           [░░░░░░░░░░░░░░░░░░░░]   0/10
 ─────────────────────────────────────────────────────────
-Overall                      [██████████░░░░░░░░░░]  25/50  (halfway)
+Overall                      [██████████▍░░░░░░░░░]  26/50
 ```
 
 Solutions captured so far live in [`/solutions`](solutions), organised by phase. Each `.sql` file carries the problem, my final query, and a short **"what I learned"** note.
 
 - [Phase 1 — Foundations](solutions/phase-1-foundations) — filtering, aggregation, `GROUP BY`, joins
 - [Phase 2 — Window Functions & Advanced Joins](solutions/phase-2-window-functions) — `RANK`/`DENSE_RANK`/`ROW_NUMBER`, `LAG`, `PARTITION BY`, self-joins, conditional aggregation
+- [Phase 3 — CTEs & Set Logic](solutions/phase-3-ctes) — layered `WITH` CTEs, `EXISTS`/`NOT EXISTS`, set operations
 
 ---
 
