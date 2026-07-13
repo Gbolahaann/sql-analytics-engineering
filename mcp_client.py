@@ -139,7 +139,10 @@ def get_token(force_refresh=False):
         if (force_refresh or expired) and store.get("refresh_token"):
             try:
                 return _refresh_locked(store)
-            except MCPHTTPError:
+            except (MCPHTTPError, urllib.error.URLError, OSError):
+                # Refresh failed (bad refresh token, or network unreachable).
+                # Degrade to "not authenticated" so the UI prompts a re-login
+                # instead of the whole request 500-ing.
                 return None if force_refresh or expired else store["access_token"]
         return store["access_token"]
 
