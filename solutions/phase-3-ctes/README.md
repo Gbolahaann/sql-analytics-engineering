@@ -8,3 +8,4 @@
 | 10090 | [Percentage of Shipable Orders](10090-percentage-of-shipable-orders.sql) | Medium | Conditional COUNT over total, floated + scaled; NULL = unknown address (IS NOT NULL); LEFT JOIN keeps all orders in the denominator. |
 | 9905 | [Highest Target Under Manager](9905-highest-target-under-manager.sql) | Medium | Top-with-ties = DENSE_RANK, filter rnk=1 in a CTE. Simplification: no self-join needed to filter by manager_id, no SUM when each row is unique. |
 | 10130 | [Inspections by Risk Category per Type](10130-inspections-by-risk-category-per-type.sql) | Medium | Pivot with COUNT(CASE WHEN category THEN id END) — one column per category. Catch: plain COUNT not COUNT(DISTINCT), since one inspection spans many rows. |
+| 9814 | [Counting Instances in Text](9814-counting-instances-in-text.sql) | Hard | Explode text into word-rows with regexp_split_to_table, then GROUP BY + COUNT. Harden with lower() (case) and split on `[^a-z]+` (punctuation). |
