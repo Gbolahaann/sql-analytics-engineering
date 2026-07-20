@@ -27,10 +27,10 @@ A 50-question roadmap across four phases.
 ```
 Phase 1 — Foundations        [████████████████████]  10/10 ✅
 Phase 2 — Window Functions   [████████████████████]  15/15 ✅
-Phase 3 — CTEs               [██████████▋░░░░░░░░]   8/15
+Phase 3 — CTEs               [████████████░░░░░░░░]   9/15
 Phase 4 — Advanced           [░░░░░░░░░░░░░░░░░░░░]   0/10
 ─────────────────────────────────────────────────────────
-Overall                      [█████████████▏░░░░░░]  33/50
+Overall                      [█████████████▌░░░░░░]  34/50
 ```
 
 Solutions captured so far live in [`/solutions`](solutions), organised by phase. Each `.sql` file carries the problem, my final query, and a short **"what I learned"** note.
