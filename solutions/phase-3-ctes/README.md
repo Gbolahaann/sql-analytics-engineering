@@ -12,3 +12,4 @@
 | 10049 | [Reviews of Categories](10049-reviews-of-categories.sql) | Medium | Semicolon-separated list in a column → explode with regexp_split_to_table('\s*;\s*'), carry review_count along, GROUP BY + SUM. |
 | 10085 | [Matching Users Pairs](10085-matching-users-pairs.sql) | Medium | Self-join to compare rows: = for "same", <> for "different". Pair-direction wrinkle: this grader wants both (a,b) and (b,a), so a.id <> b.id (not <). |
 | 9856 | [Employees With the Same Salary](9856-employees-with-the-same-salary.sql) | Medium | COUNT(*) OVER (PARTITION BY salary) > 1 as an existence test. Reinforced: match output columns exactly, and only compute what the output needs. |
+| 10078 | [Matching Similar Hosts and Guests](10078-matching-hosts-and-guests.sql) | Medium | Two tables joined on matching attributes (gender AND nationality). No </<> trick — that's only for self-joins. |
